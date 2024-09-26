@@ -25,7 +25,7 @@ flowchart LR
 
 - **HAPI FHIR Server**: A fully functional FHIR server using HAPI FHIR jpa-starter.
 - **Database**: Pre-configured database to store FHIR data.
-- **File Server**: A file server for managing and importing synthetic FHIR data.
+- **File Server**: A file server for importing synthetic FHIR data.
 
 ## Prerequisites
 
