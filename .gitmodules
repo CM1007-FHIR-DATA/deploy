@@ -1,0 +1,4 @@
+[submodule "synthea"]
+	path = synthea
+	url = https://github.com/CM1007-FHIR-DATA/synthea.git
+	shallow = true

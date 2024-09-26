@@ -30,7 +30,7 @@ flowchart LR
 ## Prerequisites
 
 - Docker and Docker Compose installed on your system.
-- Syntetic data or the ability to run a Java program to generate it
+- Syntetic data files or the ability to run a Java program to generate it
 - Python 3
 
 ## Installation
@@ -38,18 +38,31 @@ flowchart LR
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/CM1007-FHIR-DATA/deploy.git
+   git clone https://github.com/CM1007-FHIR-DATA/deploy.git --recurse-submodules
    ```
 
 2. Navigate to the project directory:
+
    ```bash
    cd deploy
    ```
-3. Start the services using Docker Compose:
+
+3. Generate synthetic data, (replace 10 with the amount of patients to generate)
+
+   ```bash
+   cd synthea && \
+   ./generate.sh 10 && \
+   cp -R output/fhir/* ../fhir-data/ && \
+   cd ..
+   ```
+
+4. Start the services using Docker Compose:
+
    ```bash
    docker-compose up -d
    ```
-4. Import synthetic data:
+
+5. Import synthetic data:
    ```bash
    python bulk_import.py
    ```

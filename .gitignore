@@ -1,2 +1,4 @@
 .env
 .venv
+fhir-data/*
+!fhir-data/index.html
