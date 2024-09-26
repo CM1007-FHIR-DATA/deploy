@@ -1,7 +1,9 @@
 services:
   hapi-fhir-test:
-    image: hapiproject/hapi:latest
+    image: phillezi/fhir-test:latest
     restart: on-failure
+    depends_on:
+      - hapi-fhir-db
     environment:
       SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-db:5432/hapi"
       SPRING_DATASOURCE_USERNAME: "admin"

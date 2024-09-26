@@ -16,7 +16,18 @@ def read_manifest(manifest_file):
 
 # function to replace fileserver urls in the manifest
 def replace_urls(file_content, old_url, new_url):
-    return file_content.replace(old_url, new_url)
+    # Recursive function to traverse and replace URLs in the dictionary
+    def recursive_replace(obj):
+        if isinstance(obj, dict):
+            return {key: recursive_replace(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [recursive_replace(item) for item in obj]
+        elif isinstance(obj, str):
+            return obj.replace(old_url, new_url)
+        else:
+            return obj
+
+    return recursive_replace(file_content)
 
 # Function to post the manifest to the fhir server
 def post(fhir_base_url, content):
@@ -44,12 +55,11 @@ def post(fhir_base_url, content):
         except json.JSONDecodeError:
             print("Failed to decode error response.")
 
-
 default_fileserver_url = "http://localhost:8000" # The default fileserver url that synthea provides
-new_fileserver_url = "http://fileserver:8000" # the filserver address from within the compose network
+new_fileserver_url = "http://fileserver:8080" # the fileserver address from within the compose network
 
 fhir_base_url = "http://localhost:8080/fhir"
-manifest_file = "fhir-data/parameters"
+manifest_file = "fhir-data/parameters.json"
 
 content = read_manifest(manifest_file)
 content = replace_urls(content, default_fileserver_url, new_fileserver_url)
