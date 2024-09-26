@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FHIR Data Fileserver</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+      }
+      .container {
+        max-width: 600px;
+        padding: 20px;
+        background-color: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+      h1 {
+        color: #333;
+        font-size: 24px;
+      }
+      p {
+        color: #555;
+        line-height: 1.6;
+      }
+      .code-window {
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        padding: 10px;
+        white-space: pre-wrap;
+        overflow-x: auto;
+        font-family: monospace;
+        margin-top: 10px;
+        max-height: 300px;
+      }
+      .button-group {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+      }
+      .btn {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .btn:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>FHIR Data Fileserver</h1>
+      <p>
+        This fileserver is used to perform bulk imports to the HAPI FHIR server.
+      </p>
+      <p>
+        If you want to bulk import data, you can place files inside the
+        <strong>fhir-data</strong> directory and then post a manifest (that
+        describes your bulk data, like the one below) to the
+        <strong
+          ><a
+            style="color: inherit"
+            href="http://localhost:8080/fhir/swagger-ui/?page=All#/System%20Level%20Operations/post__import"
+            >$import</a
+          ></strong
+        >
+        path.
+      </p>
+
+      <div id="code-window" class="code-window">Loading parameters.json...</div>
+
+      <div class="button-group">
+        <button class="btn" onclick="copyToClipboard()">
+          Copy to Clipboard
+        </button>
+        <button class="btn" onclick="postToFHIRServer()">
+          Post to FHIR Server
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let parametersContent = "";
+
+      fetch("/parameters.json")
+        .then((response) => response.text())
+        .then((data) => {
+          document.getElementById("code-window").textContent = data;
+          parametersContent = data;
+        })
+        .catch((error) => {
+          document.getElementById("code-window").textContent =
+            "Error loading file.";
+        });
+
+      function copyToClipboard() {
+        const codeContent = document.getElementById("code-window").textContent;
+        navigator.clipboard
+          .writeText(codeContent)
+          .then(() => {
+            alert("Copied to clipboard!");
+          })
+          .catch((err) => {
+            console.error("Failed to copy: ", err);
+          });
+      }
+
+      function postToFHIRServer() {
+        if (!parametersContent) {
+          alert("Error: No content to post.");
+          return;
+        }
+
+        fetch("http://localhost:8080/fhir/$import", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/fhir+json",
+            Prefer: "respond-async",
+          },
+          body: parametersContent,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            alert("Successfully posted to FHIR server!");
+            console.log("Response from server:", data);
+          })
+          .catch((error) => {
+            alert("Error posting to FHIR server.");
+            console.error("Error:", error);
+          });
+      }
+    </script>
+  </body>
+</html>
