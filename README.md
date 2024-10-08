@@ -21,17 +21,54 @@ flowchart LR
     hf(HAPI FHIR Server) <-->|Stores FHIR data| db[(PostgreSQL Database)]
 ```
 
+### How it works
+
+Here is a little sequence diagram explaining how it works.
+
+```mermaid
+
+sequenceDiagram
+    participant HapIngest
+    participant HAPI-FHIR-Server
+    participant psql-db
+
+    Note over HapIngest: Start Process
+
+    HapIngest->>HAPI-FHIR-Server: Polls server until it is available
+    HAPI-FHIR-Server-->HapIngest: Responds when available
+
+    Note over HapIngest: Create Manifest
+    HapIngest->>HapIngest: Generates manifests based on resource dependencies
+
+    loop For each manifest
+        HapIngest->>HAPI-FHIR-Server: Posts manifest for bulk import
+        HAPI-FHIR-Server-->HapIngest: Responds with a job-id for bulk import
+        HAPI-FHIR-Server->>HAPI-FHIR-Server: Begins processing the manifest
+        HAPI-FHIR-Server->>HapIngest: Fetches resources specified in the manifest
+        HapIngest-->HAPI-FHIR-Server: Serves ndjson resources
+        HAPI-FHIR-Server-->psql-db: Persists the data into the database
+
+        loop Poll for job status
+            HapIngest->>HAPI-FHIR-Server: Polls the job-id status
+            HAPI-FHIR-Server-->HapIngest: Responds with job status (In progress/Completed)
+        end
+    end
+
+    Note over HapIngest: Process Complete
+
+
+```
+
 ## Features
 
 - **HAPI FHIR Server**: A fully functional FHIR server using HAPI FHIR jpa-starter.
 - **Database**: Pre-configured database to store FHIR data.
-- **File Server**: A file server for importing synthetic FHIR data.
+- **HAPIngest**: A specialized file server for importing synthetic FHIR data into the HAPI FHIR server.
 
 ## Prerequisites
 
 - Docker and Docker Compose installed on your system.
 - Syntetic data files or the ability to run a Java program to generate it
-- Python 3
 
 ## Installation
 
@@ -59,26 +96,17 @@ flowchart LR
 4. Start the services using Docker Compose:
 
    ```bash
-   docker-compose up -d
+   docker-compose up
    ```
-
-5. Import synthetic data:
-   ```bash
-   python bulk_import.py
-   ```
-
-> [!NOTE]  
-> HAPIs implementation of the bulk import seems like it is dependent on which resources loads first.
-> This can cause errors if for example Condition gets loaded before Patient or Encounter, since Conditions have references to those making the bulk import fail, my current solution is to manually edit the parameters.json to make sure the objects that are referenced get loaded before trying the ones that depend on it.
 
 ## Usage
 
 ### Starting the Server
 
-To start the HAPI FHIR server and file server, use the following command:
+To start the HAPI FHIR server and hapingest-fileserver, use the following command:
 
 ```bash
-docker-compose up -d
+docker-compose up
 ```
 
 The FHIR server will be accessible at `http://localhost:8080/fhir`.
@@ -86,9 +114,7 @@ The FHIR server will be accessible at `http://localhost:8080/fhir`.
 ### Importing Synthetic Data
 
 1. Place your synthetic FHIR data files in the `fhir-data` directory.
-2. Use the python script to post the fhir-data manifest to the hapi servers bulk import path.
-   - If you dont have `requests` installed you can run the script from a virtual environment. This can be done by running `python setup_venv.py`.
-   - Run the script with `python bulk_import.py`
+2. Run `docker-compose up`
 
 ## Configuration
 
