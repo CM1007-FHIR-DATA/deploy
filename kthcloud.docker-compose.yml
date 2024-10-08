@@ -30,7 +30,7 @@ services:
 
   hapingest:
     image: ghcr.io/cm1007-fhir-data/go-hapingest:main
-    restart: never
+    restart: on-failure
     environment:
       URL_BASE: http://hapingest
       FHIR_SERVER_URL: http://hapi-fhir-test:8080/fhir
