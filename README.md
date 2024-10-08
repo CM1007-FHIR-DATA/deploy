@@ -67,6 +67,10 @@ flowchart LR
    python bulk_import.py
    ```
 
+> [!NOTE]  
+> HAPIs implementation of the bulk import seems like it is dependent on which resources loads first.
+> This can cause errors if for example Condition gets loaded before Patient or Encounter, since Conditions have references to those making the bulk import fail, my current solution is to manually edit the parameters.json to make sure the objects that are referenced get loaded before trying the ones that depend on it.
+
 ## Usage
 
 ### Starting the Server
