@@ -1,21 +1,22 @@
 services:
-  hapi-fhir-test:
+  hapi-fhir:
     image: phillezi/fhir-test:latest
     restart: on-failure
     depends_on:
       - hapi-fhir-db
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-db:5432/hapi"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-db2:5432/hapi"
       SPRING_DATASOURCE_USERNAME: "admin"
       SPRING_DATASOURCE_PASSWORD: "admin"
       SPRING_DATASOURCE_DRIVERCLASSNAME: "org.postgresql.Driver"
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect"
       HAPI_FHIR_BULK_IMPORT_ENABLED: true
+      KTHCLOUD_CORES: 2
       KTHCLOUD_RAM: 2
     ports:
       - "8080:8080"
 
-  hapi-fhir-db:
+  hapi-fhir-db2:
     image: postgres:15-alpine
     restart: always
     environment:
@@ -33,9 +34,10 @@ services:
     restart: on-failure
     environment:
       URL_BASE: http://hapingest
-      FHIR_SERVER_URL: http://hapi-fhir-test:8080/fhir
+      FHIR_SERVER_URL: http://hapi-fhir:8080/fhir
       KTHCLOUD_CORES: 0.1
       KTHCLOUD_RAM: 0.1
+      PORT: 8081
     depends_on:
       - hapi-fhir-test
     volumes:
