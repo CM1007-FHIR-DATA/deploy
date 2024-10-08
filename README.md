@@ -96,7 +96,7 @@ sequenceDiagram
 4. Start the services using Docker Compose:
 
    ```bash
-   docker-compose up
+   docker compose up
    ```
 
 ## Usage
@@ -106,7 +106,7 @@ sequenceDiagram
 To start the HAPI FHIR server and hapingest-fileserver, use the following command:
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 The FHIR server will be accessible at `http://localhost:8080/fhir`.
@@ -114,7 +114,7 @@ The FHIR server will be accessible at `http://localhost:8080/fhir`.
 ### Importing Synthetic Data
 
 1. Place your synthetic FHIR data files in the `fhir-data` directory.
-2. Run `docker-compose up`
+2. Run `docker compose up`
 
 ## Configuration
 
