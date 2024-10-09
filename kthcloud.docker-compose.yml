@@ -27,7 +27,7 @@ services:
       KTHCLOUD_RAM: 0.1
       PORT: 5432
     volumes:
-      - data:/var/lib/postgresql/
+      - data:/var/lib/postgresql/data
 
   hapingest:
     image: ghcr.io/cm1007-fhir-data/go-hapingest:main
